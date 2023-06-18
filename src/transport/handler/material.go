@@ -1,10 +1,10 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-api/src/transport/models/payloads"
 	"net/http"
-	"strconv"
 )
 
 func (h *Handler) getAllMaterials(c *gin.Context) {
@@ -30,11 +30,12 @@ func (h *Handler) getMaterialById(c *gin.Context) {
 
 	material, err := h.services.Material.GetMaterialById(id)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		newErrorResponse(c, http.StatusConflict, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, payloads.ConvertMaterialDTOToMaterialResponse(material))
+	response := payloads.ConvertMaterialDTOToMaterialResponse(material)
+	c.JSON(http.StatusOK, response)
 }
 
 func (h *Handler) createMaterial(c *gin.Context) {
@@ -52,6 +53,17 @@ func (h *Handler) createMaterial(c *gin.Context) {
 	}
 
 	materialDTO := payloads.ConvertMaterialPayloadToMaterialDTO(&input)
+
+	material, err := h.services.Material.GetMaterialById(materialDTO.Id)
+	if material != nil {
+		newErrorResponse(c, http.StatusConflict, "material already exists")
+		return
+	}
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
 	id, err := h.services.CreateMaterial(materialDTO)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -59,7 +71,7 @@ func (h *Handler) createMaterial(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"request": "create material id " + strconv.Itoa(id),
+		"response": fmt.Sprintf("material with id %d successfully created", id),
 	})
 }
 
@@ -78,6 +90,17 @@ func (h *Handler) updateMaterial(c *gin.Context) {
 	}
 
 	materialDTO := payloads.ConvertMaterialPayloadToMaterialDTO(&input)
+
+	material, err := h.services.Material.GetMaterialById(materialDTO.Id)
+	if material != nil {
+		newErrorResponse(c, http.StatusConflict, "material already exists")
+		return
+	}
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
 	id, err := h.services.UpdateMaterial(materialDTO)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -85,7 +108,7 @@ func (h *Handler) updateMaterial(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"request": "update material id:" + strconv.Itoa(id),
+		"response": fmt.Sprintf("material with id %d successfully updated", id),
 	})
 }
 
@@ -96,9 +119,13 @@ func (h *Handler) deleteMaterial(c *gin.Context) {
 		return
 	}
 
-	material, err := h.services.GetMaterialById(id)
-	if material == nil || err != nil {
-		newErrorResponse(c, http.StatusConflict, err.Error())
+	material, err := h.services.Material.GetMaterialById(id)
+	if material == nil {
+		newErrorResponse(c, http.StatusConflict, "material does not exist")
+		return
+	}
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -109,7 +136,6 @@ func (h *Handler) deleteMaterial(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"material_id": id,
-		"request":     "delete material",
+		"response": fmt.Sprintf("material with id %d successfully deleted", id),
 	})
 }

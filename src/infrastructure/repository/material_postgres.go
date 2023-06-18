@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"go-api/src/domain"
@@ -23,7 +22,6 @@ func (p *MaterialPostgres) GetMaterialById(materialId int) (*domain.MaterialDTO,
 	var query = fmt.Sprintf("SELECT * FROM %s WHERE id = $1", MaterialsTable)
 	err := p.db.Get(&material, query, materialId)
 	if err != nil {
-		// sql.ErrNoRows
 		log.Printf("Level: repos; func GetMaterialById(): material with name = %d does not exist",
 			materialId,
 		)
@@ -50,16 +48,6 @@ func (p *MaterialPostgres) GetAllMaterials() ([]domain.MaterialDTO, error) {
 
 // CreateMaterial Создать
 func (p *MaterialPostgres) CreateMaterial(material *domain.MaterialDTO) (int, error) {
-	// Проверяем Название на уникальность в таблице
-	var exisingMaterial models.MaterialTable
-	var checkMaterialQuery = fmt.Sprintf("SELECT * FROM %s WHERE material_name = $1 LIMIT 1", MaterialsTable)
-	err := p.db.Get(&exisingMaterial, checkMaterialQuery, material.MaterialName)
-	if err == nil {
-		//if err != sql.ErrNoRows {
-		log.Printf("Level: repos; func createMaterial(): material already exists: %v", exisingMaterial)
-		return 0, errors.New("material already exists") // OR exisingMaterial.id, nil
-	}
-
 	var id int
 	var createMaterialQuery = fmt.Sprintf(
 		"INSERT INTO %s (material_name, units) VALUES ($1, $2) RETURNING id",
@@ -68,7 +56,7 @@ func (p *MaterialPostgres) CreateMaterial(material *domain.MaterialDTO) (int, er
 		material.MaterialName,
 		material.UnitName,
 	)
-	err = row.Scan(&id)
+	err := row.Scan(&id)
 	if err != nil {
 		return 0, err
 	}
@@ -79,19 +67,11 @@ func (p *MaterialPostgres) CreateMaterial(material *domain.MaterialDTO) (int, er
 
 // UpdateMaterial Обновить данные
 func (p *MaterialPostgres) UpdateMaterial(material *domain.MaterialDTO) (int, error) {
-	// Проверяем наличие в таблице
-	var exisingMaterial models.MaterialTable
-	var checkMaterialQuery = fmt.Sprintf("SELECT * FROM %s WHERE id = $1", MaterialsTable)
-	err := p.db.Get(&exisingMaterial, checkMaterialQuery, material.Id)
-	if err != nil {
-		return 0, err
-	}
-
 	var updateMaterialQuery = fmt.Sprintf(
 		"UPDATE %s SET material_name = $1, units = $2 WHERE id = $3",
 		MaterialsTable,
 	)
-	_, err = p.db.Exec(updateMaterialQuery,
+	_, err := p.db.Exec(updateMaterialQuery,
 		material.MaterialName,
 		material.UnitName,
 		material.Id,

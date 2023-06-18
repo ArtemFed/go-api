@@ -1,7 +1,7 @@
 package payloads
 
 import (
-	"github.com/north-hascii/crm-planning/planning_service/src/domain/models"
+	"go-api/src/domain"
 )
 
 type MaterialPayload struct {
@@ -20,15 +20,15 @@ type MaterialsArrayResponse struct {
 	Materials []MaterialResponse `json:"materials"`
 }
 
-func ConvertMaterialPayloadToMaterialDTO(payload *MaterialPayload) *models.MaterialDTO {
-	return &models.MaterialDTO{
+func ConvertMaterialPayloadToMaterialDTO(payload *MaterialPayload) *domain.MaterialDTO {
+	return &domain.MaterialDTO{
 		Id:           payload.Id,
 		MaterialName: payload.MaterialName,
 		UnitName:     payload.UnitName,
 	}
 }
 
-func ConvertMaterialDTOToMaterialResponse(dto *models.MaterialDTO) *MaterialResponse {
+func ConvertMaterialDTOToMaterialResponse(dto *domain.MaterialDTO) *MaterialResponse {
 	return &MaterialResponse{
 		Id:           dto.Id,
 		MaterialName: dto.MaterialName,

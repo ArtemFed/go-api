@@ -21,3 +21,14 @@ func getContextId(c *gin.Context) (int, error) {
 	log.Printf("func getContextId(): id=%d", id)
 	return idInt, nil
 }
+
+//func getUrlParamId(c *gin.Context) {
+//	// Получаем параметры из запроса
+//	params := strings.Split(c.Params, "/")
+//	id, err := strconv.Atoi(params[len(params)-1])
+//	if err != nil {
+//		// Обработка ошибки, если id не был передан или передан неверный формат
+//		w.WriteHeader(http.StatusBadRequest)
+//		return
+//	}
+//}

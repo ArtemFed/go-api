@@ -1,5 +1,7 @@
 package repository
 
 const (
-	MaterialsTable = "materials"
+	studentsTable       = "students"
+	gradesTable         = "grades"
+	studentsGradesTable = "students_grades"
 )

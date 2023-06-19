@@ -18,13 +18,21 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	api := router.Group("/api")
 	{
-		material := api.Group("/material")
+		students := api.Group("/students")
 		{
-			material.GET("/get-all", h.getAllMaterials)
-			material.GET("/get-by-id", h.getMaterialById)
-			material.POST("/create", h.createMaterial)
-			material.PUT("/update", h.updateMaterial)
-			material.DELETE("/delete", h.deleteMaterial)
+			students.GET("/get-all", h.getAllStudents)
+			students.GET("/get-by-id", h.getStudentById)
+			students.POST("/create", h.createStudent)
+			students.PUT("/update", h.updateStudent)
+			students.DELETE("/delete", h.deleteGrade)
+		}
+
+		grades := api.Group("/grades")
+		{
+			grades.GET("/get-by-id", h.getGradeById)
+			grades.GET("/get-by-student-id", h.getGradesByStudentId)
+			grades.POST("/create", h.createGrade)
+			grades.DELETE("/delete", h.deleteGrade)
 		}
 	}
 

@@ -73,6 +73,18 @@ func (p *GradePostgres) CreateGrade(grade *domain.GradeDTO) (int, error) {
 		return 0, err
 	}
 
+	addStudentGradeConnectionQuery := fmt.Sprintf(
+		"INSERT INTO %s (student_id, grade_id) values ($1, $2)",
+		studentsGradesTable,
+	)
+
+	_, err = p.db.Exec(addStudentGradeConnectionQuery, grade.StudentId, id)
+	if err != nil {
+		log.Printf(
+			"func CreateGrade(): Error while trying to insert student - grade connection",
+		)
+	}
+
 	log.Printf("func createGrade(): domain.GradeDTO=%v", grade)
 	return id, nil
 }

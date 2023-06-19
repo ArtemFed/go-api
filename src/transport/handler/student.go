@@ -58,16 +58,6 @@ func (h *Handler) createStudent(c *gin.Context) {
 
 	studentDTO := payloads.ConvertStudentPayloadToStudentDTO(&input)
 
-	student, err := h.services.Student.GetStudentById(studentDTO.Id)
-	if student != nil {
-		newErrorResponse(c, http.StatusConflict, "student already exists")
-		return
-	}
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-
 	id, err := h.services.CreateStudent(studentDTO)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -100,12 +90,12 @@ func (h *Handler) updateStudent(c *gin.Context) {
 	studentDTO := payloads.ConvertStudentPayloadToStudentDTO(&input)
 
 	student, err := h.services.Student.GetStudentById(studentDTO.Id)
-	if student != nil {
-		newErrorResponse(c, http.StatusConflict, "student already exists")
-		return
-	}
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	if student == nil {
+		newErrorResponse(c, http.StatusConflict, "student does not exist")
 		return
 	}
 

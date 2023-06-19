@@ -69,7 +69,7 @@ func (h *Handler) createGrade(c *gin.Context) {
 		newErrorResponse(c, http.StatusConflict, "student does noy exist")
 		return
 	}
-	if err == nil {
+	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}

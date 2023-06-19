@@ -47,7 +47,7 @@ func (p *GradePostgres) GetGradesByStudentId(studentId int) (*[]domain.GradeDTO,
 		gradesTable,
 		studentsGradesTable,
 	)
-	err := p.db.Select(&grades, getStudentGradesQuery)
+	err := p.db.Select(&grades, getStudentGradesQuery, studentId)
 	log.Printf("func GetAllGrades(): []domain.GradeDTO=%v", grades)
 
 	gradeDTOs := make([]domain.GradeDTO, len(grades))
@@ -75,26 +75,6 @@ func (p *GradePostgres) CreateGrade(grade *domain.GradeDTO) (int, error) {
 
 	log.Printf("func createGrade(): domain.GradeDTO=%v", grade)
 	return id, nil
-}
-
-// UpdateGrade Обновить данные
-func (p *GradePostgres) UpdateGrade(grade *domain.GradeDTO) (int, error) {
-	var updateGradeQuery = fmt.Sprintf(
-		"UPDATE %s SET grade = $1, subject_name = $2, student_id = $3 WHERE id = $4",
-		gradesTable,
-	)
-	_, err := p.db.Exec(updateGradeQuery,
-		grade.Grade,
-		grade.SubjectName,
-		grade.StudentId,
-		grade.Id,
-	)
-	if err != nil {
-		return 0, err
-	}
-
-	log.Printf("func UpdateGrade(): domain.GradeDTO=%v", grade)
-	return grade.Id, nil
 }
 
 // DeleteGrade Удалить

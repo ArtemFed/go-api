@@ -24,7 +24,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			students.GET("/get-by-id", h.getStudentById)
 			students.POST("/create", h.createStudent)
 			students.PUT("/update", h.updateStudent)
-			students.DELETE("/delete", h.deleteGrade)
+			students.DELETE("/delete", h.deleteStudent)
 		}
 
 		grades := api.Group("/grades")
